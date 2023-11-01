@@ -4,7 +4,6 @@ from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, CallbackQueryHandler
 from datetime import datetime
 
-
 # Constants
 TOKEN = '6896759918:AAELCJsCVtDz8xLSwLb4g12XyFkuDKoZUWE'
 
@@ -22,7 +21,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("User", callback_data="user")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi! Welcome to NP calendar", reply_markup=reply_markup)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi! Welcome to NP calendar",
+                                   reply_markup=reply_markup)
+
 
 # Handle button clicks
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -36,6 +37,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await schedule_params(update, context, query.data)
 
+
 # Gets user info
 async def user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     source = update.message or update.callback_query
@@ -46,6 +48,7 @@ async def user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text += f'<b>ID:</b> {u.id}\n'
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=user_text, parse_mode=ParseMode.HTML)
+
 
 # Gets list of events
 async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -59,6 +62,7 @@ async def schedule(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await context.bot.send_message(chat_id=update.effective_chat.id, text="What period?", reply_markup=reply_markup)
+
 
 async def schedule_params(update: Update, context: ContextTypes.DEFAULT_TYPE, day_type):
     # Get list of events
@@ -81,13 +85,21 @@ async def schedule_params(update: Update, context: ContextTypes.DEFAULT_TYPE, da
             schedule_text += f"• <b>{event['t_start']} - {event['t_end']}</b>\n"
             schedule_text += f"{event['lecture']}\n\n"
 
+    # Create keyboard inline buttons
+    keyboard = [
+        [InlineKeyboardButton("Schedule", callback_data="schedule")],
+        [InlineKeyboardButton("User", callback_data="user")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
     # Send the events
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=schedule_text, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=schedule_text, parse_mode=ParseMode.HTML,
+                                   reply_markup=reply_markup)
 
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TOKEN).build()
-    
+
     start_handler = CommandHandler('start', start)
     userf_handler = CommandHandler('user', user)
     schedule_handler = CommandHandler('schedule', schedule)
@@ -97,5 +109,5 @@ if __name__ == '__main__':
     application.add_handler(userf_handler)
     application.add_handler(schedule_handler)
     application.add_handler(button_handler)
-    
+
     application.run_polling()
