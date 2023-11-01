@@ -17,13 +17,12 @@ services:
       - 5001:5000
     depends_on:
       - postgres 
-  liquidbase:
+  np-bot:
     build:
-      context: ./liquibase
+      context: ./telegram_bot
     depends_on:
       - postgres
-    env_file:
-      - liquibase/.env
+      - np-api
   
 volumes:
   postgres: {}
