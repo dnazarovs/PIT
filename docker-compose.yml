@@ -1,0 +1,29 @@
+version: '3.4'
+services:
+  postgres:
+    image: postgres:15.3-alpine
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - postgres/.env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  np-api:
+    build:
+      context: ./np_api
+    ports:
+      - 5001:5000
+    depends_on:
+      - postgres 
+  liquidbase:
+    build:
+      context: ./liquibase
+    depends_on:
+      - postgres
+    env_file:
+      - liquibase/.env
+  
+volumes:
+  postgres: {}
